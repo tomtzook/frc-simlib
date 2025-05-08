@@ -27,6 +27,8 @@ repositories {
 
 dependencies {
     compileOnly group: 'edu.wpi.first.wpilibj', name: 'wpilibj-java', version: "$WPILIB_VERSION"
+    compileOnly group: 'edu.wpi.first.wpiunits', name: 'wpiunits-java', version: "$WPILIB_VERSION"
+    compileOnly group: 'edu.wpi.first.wpimath', name: 'wpimath-java', version: "$WPILIB_VERSION"
     compileOnly group: 'edu.wpi.first.wpiutil', name: 'wpiutil-java', version: "$WPILIB_VERSION"
     compileOnly group: 'edu.wpi.first.wpilibNewCommands', name: 'wpilibNewCommands-java', version: "$WPILIB_VERSION"
 

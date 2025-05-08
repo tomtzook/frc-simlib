@@ -10,11 +10,29 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import frc.robot.RobotMap;
+import frc.sim.MathUtil;
 import frc.sim.devices.GyroSim;
 import frc.sim.devices.MotorSim;
 
 public class TankDriveSim implements SystemSim<TankDriveSim.State> {
+
+    public static class Config {
+        public final DCMotor motorPerSide;
+        public final double motorToWheelGearRatio;
+        public final double momentOfInertiaJkgMSquared;
+        public final double weightKg;
+        public final double wheelRadiusMeters;
+        public final double trackWidthMeters;
+
+        public Config(DCMotor motorPerSide, double motorToWheelGearRatio, double momentOfInertiaJkgMSquared, double weightKg, double wheelRadiusMeters, double trackWidthMeters) {
+            this.motorPerSide = motorPerSide;
+            this.motorToWheelGearRatio = motorToWheelGearRatio;
+            this.momentOfInertiaJkgMSquared = momentOfInertiaJkgMSquared;
+            this.weightKg = weightKg;
+            this.wheelRadiusMeters = wheelRadiusMeters;
+            this.trackWidthMeters = trackWidthMeters;
+        }
+    }
 
     public static class State {
         public final double leftPositionMeters;
@@ -34,23 +52,27 @@ public class TankDriveSim implements SystemSim<TankDriveSim.State> {
     private final MotorSim rightBackMotor;
     private final GyroSim gyro;
 
+    private final Config config;
     private final DifferentialDrivetrainSim sim;
 
-    public TankDriveSim(MotorSim leftFrontMotor, MotorSim leftBackMotor, MotorSim rightFrontMotor, MotorSim rightBackMotor, GyroSim gyro) {
+    public TankDriveSim(MotorSim leftFrontMotor, MotorSim leftBackMotor,
+                        MotorSim rightFrontMotor, MotorSim rightBackMotor,
+                        GyroSim gyro,
+                        Config config) {
         this.leftFrontMotor = leftFrontMotor;
         this.leftBackMotor = leftBackMotor;
         this.rightFrontMotor = rightFrontMotor;
         this.rightBackMotor = rightBackMotor;
         this.gyro = gyro;
 
-        // todo: receive these
+        this.config = config;
         sim = new DifferentialDrivetrainSim(
-                DCMotor.getFalcon500(RobotMap.DRIVE_SIDE_MOTOR_COUNT),
-                RobotMap.DRIVE_MOTOR_TO_WHEEL_GEAR_RATIO,
-                RobotMap.DRIVE_MOMENT_OF_INERTIA,
-                RobotMap.ROBOT_WEIGHT_KG,
-                RobotMap.DRIVE_WHEEL_RADIUS_M,
-                RobotMap.DRIVE_TRACK_WIDTH_M,
+                config.motorPerSide,
+                config.motorToWheelGearRatio,
+                config.momentOfInertiaJkgMSquared,
+                config.weightKg,
+                config.wheelRadiusMeters,
+                config.trackWidthMeters,
                 // [x, y, heading, left velocity, right velocity, left distance, right distance]
                 MatBuilder.fill(Nat.N7(), Nat.N1(), 0, 0, 0, 0, 0, 0, 0)
         );
@@ -71,15 +93,15 @@ public class TankDriveSim implements SystemSim<TankDriveSim.State> {
 
         sim.update(dtSeconds);
 
-        Angle leftPosition = positionMetersToRotorPosition(sim.getLeftPositionMeters());
-        AngularVelocity leftVelocity = velocityMpsToRotorVelocity(sim.getLeftVelocityMetersPerSecond());
+        Angle leftPosition = MathUtil.positionMetersToRotorPosition(sim.getLeftPositionMeters(), config.motorToWheelGearRatio, config.wheelRadiusMeters);
+        AngularVelocity leftVelocity = MathUtil.velocityMpsToRotorVelocity(sim.getLeftVelocityMetersPerSecond(), config.motorToWheelGearRatio, config.wheelRadiusMeters);
         leftFrontMotor.setPosition(leftPosition);
         leftBackMotor.setPosition(leftPosition);
         leftFrontMotor.setVelocity(leftVelocity);
         leftBackMotor.setVelocity(leftVelocity);
 
-        Angle rightPosition = positionMetersToRotorPosition(sim.getRightPositionMeters());
-        AngularVelocity rightVelocity = velocityMpsToRotorVelocity(sim.getRightVelocityMetersPerSecond());
+        Angle rightPosition = MathUtil.positionMetersToRotorPosition(sim.getRightPositionMeters(), config.motorToWheelGearRatio, config.wheelRadiusMeters);
+        AngularVelocity rightVelocity = MathUtil.velocityMpsToRotorVelocity(sim.getRightVelocityMetersPerSecond(), config.motorToWheelGearRatio, config.wheelRadiusMeters);
         rightFrontMotor.setPosition(rightPosition);
         rightBackMotor.setPosition(rightPosition);
         rightFrontMotor.setVelocity(rightVelocity);
@@ -92,15 +114,5 @@ public class TankDriveSim implements SystemSim<TankDriveSim.State> {
                 new State(sim.getLeftPositionMeters(), sim.getRightPositionMeters(), sim.getHeading()),
                 Units.Amps.of(sim.getCurrentDrawAmps())
         );
-    }
-
-    private static Angle positionMetersToRotorPosition(double positionMeters) {
-        return Units.Rotations.of(
-                (positionMeters * RobotMap.DRIVE_MOTOR_TO_WHEEL_GEAR_RATIO) / RobotMap.DRIVE_WHEEL_CIRCUMFERENCE_M
-        );
-    }
-
-    private static AngularVelocity velocityMpsToRotorVelocity(double velocityMps) {
-        return Units.RotationsPerSecond.of(velocityMps * RobotMap.DRIVE_MOTOR_TO_WHEEL_GEAR_RATIO / RobotMap.DRIVE_WHEEL_CIRCUMFERENCE_M);
     }
 }
