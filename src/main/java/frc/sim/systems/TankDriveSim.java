@@ -1,7 +1,8 @@
-package frc.sim;
+package frc.sim.systems;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -13,7 +14,19 @@ import frc.robot.RobotMap;
 import frc.sim.devices.GyroSim;
 import frc.sim.devices.MotorSim;
 
-public class TankDriveSim {
+public class TankDriveSim implements SystemSim<TankDriveSim.State> {
+
+    public static class State {
+        public final double leftPositionMeters;
+        public final double rightPositionMeters;
+        public final Rotation2d rotation;
+
+        public State(double leftPositionMeters, double rightPositionMeters, Rotation2d rotation) {
+            this.leftPositionMeters = leftPositionMeters;
+            this.rightPositionMeters = rightPositionMeters;
+            this.rotation = rotation;
+        }
+    }
 
     private final MotorSim leftFrontMotor;
     private final MotorSim leftBackMotor;
@@ -43,7 +56,8 @@ public class TankDriveSim {
         );
     }
 
-    public void update(Voltage busVoltage, Time dt) {
+    @Override
+    public SystemOutput<TankDriveSim.State> update(Voltage busVoltage, Time dt) {
         double dtSeconds = dt.in(Units.Second);
 
         Voltage leftFrontOutput = leftFrontMotor.updateOutput(busVoltage, dt);
@@ -73,6 +87,11 @@ public class TankDriveSim {
 
         Angle gyroYaw = Units.Degrees.of(sim.getHeading().getDegrees());
         gyro.setYaw(gyroYaw);
+
+        return new SystemOutput<>(
+                new State(sim.getLeftPositionMeters(), sim.getRightPositionMeters(), sim.getHeading()),
+                Units.Amps.of(sim.getCurrentDrawAmps())
+        );
     }
 
     private static Angle positionMetersToRotorPosition(double positionMeters) {

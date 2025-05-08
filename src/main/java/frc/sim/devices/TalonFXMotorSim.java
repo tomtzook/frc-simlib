@@ -32,6 +32,16 @@ public class TalonFXMotorSim implements MotorSim {
     }
 
     @Override
+    public void setForwardLimitSwitchPressed(boolean pressed) {
+        sim.setForwardLimit(pressed);
+    }
+
+    @Override
+    public void setReverseLimitSwitchPressed(boolean pressed) {
+        sim.setReverseLimit(pressed);
+    }
+
+    @Override
     public Voltage updateOutput(Voltage busVoltage, Time dt) {
         sim.setSupplyVoltage(busVoltage);
         return sim.getMotorVoltageMeasure();
