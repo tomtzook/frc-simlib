@@ -76,6 +76,24 @@ public class TankDriveSim implements SystemSim<TankDriveSim.State> {
                 // [x, y, heading, left velocity, right velocity, left distance, right distance]
                 MatBuilder.fill(Nat.N7(), Nat.N1(), 0, 0, 0, 0, 0, 0, 0)
         );
+
+        leftFrontMotor.setInverted(false);
+        leftFrontMotor.setPosition(Units.Degrees.zero());
+        leftFrontMotor.setVelocity(Units.Degrees.per(Units.Second).zero());
+
+        leftBackMotor.setInverted(false);
+        leftBackMotor.setPosition(Units.Degrees.zero());
+        leftBackMotor.setVelocity(Units.Degrees.per(Units.Second).zero());
+
+        rightFrontMotor.setInverted(false);
+        rightFrontMotor.setPosition(Units.Degrees.zero());
+        rightFrontMotor.setVelocity(Units.Degrees.per(Units.Second).zero());
+
+        rightBackMotor.setInverted(false);
+        rightBackMotor.setPosition(Units.Degrees.zero());
+        rightBackMotor.setVelocity(Units.Degrees.per(Units.Second).zero());
+
+        gyro.setYaw(Units.Degrees.zero());
     }
 
     @Override

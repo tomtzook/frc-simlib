@@ -55,6 +55,10 @@ public class ElevatorSim implements SystemSim<ElevatorSim.State> {
                 true,
                 0
         );
+
+        motor.setInverted(false);
+        motor.setPosition(Units.Degrees.zero());
+        motor.setVelocity(Units.Degrees.per(Units.Second).zero());
     }
 
     public SystemOutput<State> update(Voltage busVoltage, Time dt) {
