@@ -96,7 +96,7 @@ public class SwerveSim implements SystemSim<SwerveSim.State> {
         Pose2d newPose = new Pose2d(
                 lastPose.getX() + speeds.vxMetersPerSecond * dtSeconds,
                 lastPose.getY() + speeds.vyMetersPerSecond * dtSeconds,
-                Rotation2d.fromDegrees(lastPose.getRotation().getDegrees() + speeds.omegaRadiansPerSecond * dtSeconds)
+                new Rotation2d(lastPose.getRotation().getRadians() + speeds.omegaRadiansPerSecond * dtSeconds)
         );
 
         gyro.setYaw(newPose.getRotation().getMeasure());

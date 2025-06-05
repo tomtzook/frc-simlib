@@ -11,7 +11,7 @@ public class MathUtil {
     }
 
     public static double velocityRpmToVelocityMps(double rpm, double gearRatio, double wheelRadius) {
-        return rpm / 60 * 2 * Math.PI * wheelRadius / gearRatio;
+        return (rpm / 60) * (2 * Math.PI * wheelRadius) / gearRatio;
     }
 
     public static Angle positionMetersToRotorPosition(double positionMeters, double motorToWheelGearRatio, double wheelRadiusMeters) {

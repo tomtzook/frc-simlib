@@ -100,8 +100,8 @@ public class SwerveModuleSim implements SystemSim<SwerveModuleState> {
 
         absEncoder.setPosition(steerSim.getAngularPosition());
 
-        double driveVelocityMps = MathUtil.velocityRpmToVelocityMps(driveSim.getAngularVelocityRPM(), config.driveToWheelGearRatio, config.driveWheelRadiusMeters);
-        double steerPositionDegrees = MathUtil.positionRotationsToDegrees(steerSim.getAngularPositionRotations(), config.steerToWheelGearRatio);
+        double driveVelocityMps = MathUtil.velocityRpmToVelocityMps(driveSim.getAngularVelocityRPM(), 1, config.driveWheelRadiusMeters);
+        double steerPositionDegrees = MathUtil.positionRotationsToDegrees(steerSim.getAngularPositionRotations(), 1);
         return new SystemOutput<>(
                 new SwerveModuleState(
                         driveVelocityMps,

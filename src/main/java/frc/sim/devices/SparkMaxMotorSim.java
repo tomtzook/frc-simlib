@@ -32,7 +32,6 @@ public class SparkMaxMotorSim implements MotorSim {
     @Override
     public void setInverted(boolean inverted) {
         // todo: support
-        throw new UnsupportedOperationException();
     }
 
     @Override
