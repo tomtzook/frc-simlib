@@ -1,10 +1,8 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'signing'
+    id 'org.jreleaser' version '1.17.0'
 }
-
-apply from: rootProject.file('extras.gradle')
 
 group GROUP
 version VERSION
@@ -86,27 +84,25 @@ publishing {
             }
         }
     }
-
-    repositories {
-        maven {
-            if (isReleaseBuild()) {
-                name = 'NexusStaging'
-                url = NEXUS_RELEASE_REPOSITORY_URL
-            } else {
-                name = 'NexusSnapshot'
-                url = NEXUS_SNAPSHOT_REPOSITORY_URL
-            }
-
-            credentials {
-                username getNexusUsername()
-                password getNexusPassword()
-            }
-        }
-    }
 }
 
-if (shouldSign()) {
+jreleaser {
     signing {
-        sign publishing.publications.mavenJava
+        active = 'ALWAYS'
+        armored = true
+        mode = 'FILE'
+        publicKey = '/public.pgp'
+        secretKey = '/private.pgp'
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('target/staging-deploy')
+                }
+            }
+        }
     }
 }
